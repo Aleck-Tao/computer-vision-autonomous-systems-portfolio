@@ -1,0 +1,10 @@
+{
+  "mission_type": "inspection",
+  "target_area": "corridor",
+  "speed_mode": "low",
+  "min_obstacle_clearance_m": 1.5,
+  "return_to_home_on_link_loss": true,
+  "stop_on_low_lidar_confidence": true,
+  "report_required": true,
+  "source_instruction": "Inspect the corridor, keep at least 1.5 metres away from obstacles, and return to the start point if the link becomes unstable."
+}

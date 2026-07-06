@@ -1,0 +1,3 @@
+Inspect the corridor, keep at least 1.5 metres away from obstacles, and return to the start point if the link becomes unstable.
+Move to the target area, avoid obstacles, maintain low speed, and stop if LiDAR confidence is low.
+Search the indoor test area and generate a short report of detected obstacles and risky regions.

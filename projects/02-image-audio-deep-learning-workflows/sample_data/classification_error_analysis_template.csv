@@ -1,0 +1,3 @@
+sample_id,true_label,predicted_label,confidence,failure_category,notes
+example_001,pedestrian,cyclist,0.62,visual_ambiguity,Synthetic placeholder row; replace with real experiment output.
+example_002,free_space,obstacle,0.58,data_shift,Synthetic placeholder row; replace with real experiment output.
