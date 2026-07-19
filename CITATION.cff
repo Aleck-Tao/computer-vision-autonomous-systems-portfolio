@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If this portfolio supports your research review, please cite the repository."
+title: "Computer Vision and Autonomous Systems Research Portfolio"
+type: software
+authors:
+  - family-names: Tao
+    given-names: Yuanyuan
+repository-code: "https://github.com/Aleck-Tao/computer-vision-autonomous-systems-portfolio"
+license: MIT
+version: 1.0.0
+date-released: 2026-07-19

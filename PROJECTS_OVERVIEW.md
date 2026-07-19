@@ -1,24 +1,35 @@
-# Public Evidence and Claim Boundaries
+# Public evidence and claim boundaries
 
-This page is a reviewer-oriented index of what can be verified in the repository.
+This page is a reviewer-oriented index of what can be verified publicly. The portfolio is structured to distinguish integrated physical-system evidence from focused, independently reproducible software repositories.
 
-## Strongest public evidence
+## Specialist repositories
 
-1. **Reproducible diagnostics package** — source code, CLI, deterministic benchmark, quality-gate configuration, tests, reports, SVG dashboards and CI workflow.
-2. **Physical UAV field-test media** — two original MP4 files, representative frames, media metadata and SHA-256 hashes.
-3. **Real-video quality audit** — decoded image metrics over both released clips, with per-frame CSV and input hashes.
-4. **Safety-aware mission interface** — structured mission output and a deterministic validator that rejects missing fail-safe behavior.
+| Repository | Public maturity | Strongest evidence | Appropriate reviewer use |
+|---|---|---|---|
+| [UAV multisensor diagnostics](https://github.com/Aleck-Tao/uav-multisensor-diagnostics) | Reproducible software project | CLI, five tests, deterministic benchmark, versioned gates, JSON/Markdown/SVG reports and CI | Evaluate sensor-integrity reasoning, trajectory metrics, fault injection, and experiment acceptance |
+| [Safety-constrained UAV mission interface](https://github.com/Aleck-Tao/safety-constrained-uav-mission-interface) | Reproducible interface and policy project | Typed contract, schema, parser, fail-closed validation, threat model, seven tests and CI | Evaluate system decomposition and the boundary between language intent and control |
+| [UAV flight-video quality audit](https://github.com/Aleck-Tao/uav-flight-video-quality-audit) | Reproducible analysis of released real media | Two MP4 files, hashes, 224 frame samples, metrics, reports and CI | Evaluate visual-data provenance and evidence-quality analysis |
+| [Multichannel thermal validation toolkit](https://github.com/Aleck-Tao/multichannel-thermal-validation-toolkit) | Reproducible synthetic measurement project | Defensive protocol codec, simulator, status-aware analysis, nine tests and CI | Evaluate embedded sensing, experimental validation, and confidentiality-aware public communication |
+
+## Integrated repository evidence
+
+1. **Physical UAV field-test media** — two outdoor MP4 clips, representative stills, media metadata, and SHA-256 hashes.
+2. **Integrated system architecture** — a documented connection between perception, mission representation, safety checks, flight-control interfaces, and post-flight validation.
+3. **Reproducible diagnostic package** — a local copy of the multisensor benchmark with data, reports, tests, and root CI.
+4. **Real-video audit** — a local analysis path over the released field clips.
+
+## Claim matrix
+
+| Claim | Public evidence | Explicit limitation |
+|---|---|---|
+| Built and tested a physical UAV platform | Outdoor MP4 clips, stills, metadata, and media manifest | Footage does not prove autonomous operation |
+| Implemented safety-aware mission handling | Typed mission contract and deterministic validator | Public parser is rule-based, not a trained language/VLA model |
+| Built reproducible sensor and trajectory diagnostics | Package, CLI, tests, benchmark data, reports, and CI | Included ATE/RPE values are controlled simulation results |
+| Audited real field-video quality | 224 sampled frames with CSV, JSON, report, SVG, and hashes | Quality metrics do not establish task success or autonomy |
+| Designed a multichannel validation workflow | Independent public codec, simulator, metrics, gates, and reports | No client data, commercial protocol, chip identity, or proprietary algorithm is included |
 
 ## Evidence policy
 
-Every quantitative statement should be traceable to a committed result file and a command that regenerates it. Simulated values are labelled as benchmark results. Field-test media are described only as evidence of physical platform testing, not as proof of autonomous performance.
+Every quantitative statement should be traceable to a committed result file and a command that regenerates it. Synthetic values are labelled as benchmarks. Field media are described only as evidence of physical testing. Where confidential or unpublished material would be required to support a stronger claim, the stronger claim is not made.
 
-## Project status
-
-| Project | Public maturity | Recommended reviewer entry point |
-|---|---|---|
-| UAV multi-sensor integrity and trajectory diagnostics | Reproducible software project | `projects/03-.../README.md` |
-| AI-agent-assisted UAV system | Ongoing MSc work with field-test evidence | `projects/01-.../README.md` |
-| UAV field-test video quality audit | Reproducible analysis of released real media | `projects/02-uav-flight-video-quality-audit/README.md` |
-
-Confidential dissertation logs, third-party data and unpublished hardware details are intentionally excluded. Where those materials are necessary for a claim, the claim is marked as ongoing rather than implied by a public placeholder.
+Start with the [portfolio README](README.md), then choose a specialist repository based on the research area being evaluated.
