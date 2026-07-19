@@ -7,6 +7,17 @@ from xml.sax.saxutils import escape
 from .models import AnalysisResult, GateCheck
 
 
+def _normalize_floats(value: object, decimal_places: int = 12) -> object:
+    """Remove platform-level floating-point noise from committed JSON output."""
+    if isinstance(value, float):
+        return round(value, decimal_places)
+    if isinstance(value, dict):
+        return {key: _normalize_floats(item, decimal_places) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_normalize_floats(item, decimal_places) for item in value]
+    return value
+
+
 def _format_value(check: GateCheck) -> str:
     if check.unit == "ratio":
         return f"{check.value * 100:.2f}%"
@@ -116,7 +127,8 @@ def write_svg_dashboard(result: AnalysisResult, path: Path) -> None:
 def write_outputs(result: AnalysisResult, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "metrics.json").write_text(
-        json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(_normalize_floats(result.to_dict()), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
     write_markdown_report(result, output_dir / "report.md")
     write_svg_dashboard(result, output_dir / "dashboard.svg")

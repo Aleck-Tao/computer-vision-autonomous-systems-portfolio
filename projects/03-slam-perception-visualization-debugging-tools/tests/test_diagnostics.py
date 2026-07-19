@@ -8,6 +8,7 @@ from pathlib import Path
 
 from uavdiag.io import load_sensor_timestamps, load_trajectory
 from uavdiag.pipeline import analyze_scenario
+from uavdiag.reporting import _normalize_floats
 from uavdiag.simulate import generate_scenario
 from uavdiag.timing import analyze_timing, camera_lidar_sync_p95_ms
 from uavdiag.trajectory import analyze_trajectory
@@ -22,6 +23,17 @@ def file_hash(path: Path) -> str:
 
 
 class DiagnosticsTests(unittest.TestCase):
+    def test_committed_metrics_ignore_platform_float_noise(self) -> None:
+        windows_result = {
+            "ate_rmse_m": 0.03699473286237801,
+            "path_length_error_pct": 6.725621413593617,
+        }
+        linux_result = {
+            "ate_rmse_m": 0.03699473286237783,
+            "path_length_error_pct": 6.725621413593603,
+        }
+        self.assertEqual(_normalize_floats(windows_result), _normalize_floats(linux_result))
+
     def test_generator_is_byte_deterministic(self) -> None:
         with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
             first_path, second_path = Path(first), Path(second)
