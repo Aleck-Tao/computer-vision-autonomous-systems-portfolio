@@ -1,15 +1,14 @@
-"""
-Safety-check module for structured UAV mission plans.
+"""Fail-closed validation for the public UAV mission contract.
 
-The goal is to demonstrate safety-aware mission validation before action execution.
-This is a representative template for research discussion and is not flight-control software.
+This module validates mission-level constraints before a contract can be handed
+to a flight-control adapter.  It is research software, not certified flight code.
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 
 SAFETY_LIMITS = {
@@ -19,8 +18,8 @@ SAFETY_LIMITS = {
 }
 
 
-def validate_mission(plan: Dict[str, Any]) -> List[str]:
-    issues: List[str] = []
+def validate_mission(plan: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
 
     clearance = float(plan.get("min_obstacle_clearance_m", 0.0))
     if clearance < SAFETY_LIMITS["min_clearance_m"]:
@@ -52,7 +51,7 @@ def main() -> None:
         for issue in issues:
             print(f"- {issue}")
     else:
-        print("Mission passed the example safety checks.")
+        print("Mission passed the configured safety checks.")
 
 
 if __name__ == "__main__":

@@ -1,83 +1,79 @@
-# Computer Vision, Autonomous Systems and AI-Agent Portfolio
+# Computer Vision and Autonomous Systems Research Portfolio
 
-This repository presents selected computer vision, autonomous systems and AI-agent-related projects by **Yuanyuan Tao (Alec)**, MSc Electronic Engineering candidate at Durham University.
+I am **Yuanyuan Tao (Alec)**, an MSc Electronic Engineering candidate at Durham University. My current work connects physical UAV experimentation with multi-sensor perception, mission-level language interfaces and reproducible safety/diagnostic tooling.
 
-It is prepared as a professional project portfolio for PhD applications in areas such as:
+This repository is organized around public evidence rather than broad skill claims: runnable code, deterministic experiments, tests, machine-readable results and field-test media. Ongoing dissertation material that cannot be released is marked explicitly.
 
-- Computer Vision
-- Vision-Language-Action (VLA) Models
-- Autonomous Driving / Autonomous Systems
-- LiDAR and Stereo Perception
-- AI-Agent-Assisted Robotics
-- Multimodal Sensing and Real-World System Validation
+## Featured work
 
-> **Note on availability:** Some code, datasets and hardware details are not fully public because the MSc dissertation is ongoing and parts of the work involve project confidentiality. This repository therefore provides project summaries, technical scope, representative templates, synthetic-data demonstrations, and reproducible components where possible.
+### 1. UAV multi-sensor integrity and trajectory diagnostics
 
----
+A complete Python research tool that detects timestamp jitter, frame loss, out-of-order samples, Camera–LiDAR synchronization error and trajectory degradation. It includes controlled fault injection, SE(2)-aligned ATE/RPE analysis, configurable quality gates, SHA-256 provenance, four unit tests and GitHub Actions reproducibility.
 
-## Featured Projects
+| Scenario | Verdict | ATE RMSE | RPE RMSE | Camera–LiDAR sync p95 | Failed gates |
+|---|:---:|---:|---:|---:|---:|
+| Baseline | **PASS** | 0.0370 m | 0.0440 m | 2.206 ms | 0 |
+| Degraded | **FAIL** | 0.2119 m | 0.1525 m | 18.314 ms | 11 |
 
-| Project | Main relevance | Status |
+<p>
+  <img src="projects/03-slam-perception-visualization-debugging-tools/results/baseline/dashboard.svg" alt="Baseline diagnostic dashboard" width="49%">
+  <img src="projects/03-slam-perception-visualization-debugging-tools/results/degraded/dashboard.svg" alt="Degraded diagnostic dashboard" width="49%">
+</p>
+
+[`Open the project →`](projects/03-slam-perception-visualization-debugging-tools/)
+
+### 2. AI-agent-assisted UAV system and field testing
+
+An ongoing MSc system project connecting LiDAR/stereo perception, structured mission contracts, deterministic safety checks, flight-control interfaces and post-flight validation. Two outdoor flight-test videos (3:43 total) provide public evidence of the physical platform; the repository carefully avoids treating video as proof of autonomy.
+
+<p>
+  <img src="projects/01-ai-agent-assisted-autonomous-uav/assets/flight_test_clip_a.jpg" alt="Outdoor UAV field test A" width="49%">
+  <img src="projects/01-ai-agent-assisted-autonomous-uav/assets/flight_test_clip_b.jpg" alt="Outdoor UAV field test B" width="49%">
+</p>
+
+[`Open the project →`](projects/01-ai-agent-assisted-autonomous-uav/)
+
+## Research evidence map
+
+| Claim | Public evidence | Boundary |
 |---|---|---|
-| [AI-Agent-Assisted Autonomous UAV using LiDAR, Stereo Vision and Starlink](./projects/01-ai-agent-assisted-autonomous-uav/) | Language-conditioned autonomous systems, perception-to-action reasoning, LiDAR/stereo sensing, communication-aware deployment | Ongoing MSc dissertation |
-| [Image and Audio Deep Learning Workflows](./projects/02-image-audio-deep-learning-workflows/) | Data pipelines, model training/evaluation, multimodal learning preparation, error analysis | Coursework / project work |
-| [SLAM and Perception Visualization Debugging Tools](./projects/03-slam-perception-visualization-debugging-tools/) | Trajectory plotting, timing diagnostics, sensor-fusion debugging, safety-critical perception validation | Research-supporting workflow |
+| Built and tested a physical UAV platform | Two outdoor MP4 clips, extracted frames, metadata and SHA-256 manifest | Footage does not prove autonomous operation |
+| Implemented safety-aware mission handling | Typed mission JSON and deterministic validation scripts | Parser is rule-based, not presented as a VLA model |
+| Built reproducible sensor/trajectory diagnostics | Importable package, CLI, tests, benchmark data, reports and CI | Included accuracy values are controlled simulation results |
+| Audited real field-test video quality | 224 decoded samples, per-frame CSV, summary JSON and SVG timeline | Image-quality metrics do not imply autonomous-flight success |
+| Understand experimental failure analysis | Fault injection covers drift, disturbance, jitter, loss, reordering and clock offset | Real-log thresholds must be platform-specific |
 
----
+## Reproduce the main result
 
-## Positioning for VLA / Autonomous Driving Research
-
-My current research direction is motivated by the same high-level structure that appears in Vision-Language-Action systems:
-
-```mermaid
-flowchart LR
-    A[Visual / Spatial Perception<br/>LiDAR, Stereo, Camera] --> B[Scene Representation<br/>obstacles, map, trajectory]
-    C[Natural-Language Instruction] --> D[AI Agent<br/>task parsing, constraints, safety checks]
-    B --> E[Decision / Planning Layer]
-    D --> E
-    E --> F[Action Execution<br/>navigation objectives]
-    F --> G[Validation<br/>logs, plots, failure analysis]
-    H[Remote Communication<br/>Starlink / network link] --> D
-    H --> G
+```bash
+cd projects/03-slam-perception-visualization-debugging-tools
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python -m uavdiag benchmark
 ```
 
-The repository is designed to show my preparation for doctoral research in VLA, autonomous driving perception and planning, and real-world AI system validation.
+Expected output:
 
----
+```text
+Ran 4 tests ... OK
+baseline: PASS (0 failed gates)
+degraded: FAIL (11 failed gates)
+```
 
-## Technical Skills Demonstrated
+### 3. Real flight-video quality audit
 
-- Python-based data analysis and visualization
-- C/C++ and embedded-development mindset
-- MATLAB basics and engineering data analysis
-- LiDAR and stereo sensing concepts
-- SLAM-style debugging and trajectory validation
-- AI-agent-assisted mission logic
-- Real-time visualization and data logging
-- Communication-aware system integration
-- Hardware/software co-design
-- Experimental validation and failure-mode analysis
+A reproducible data-quality pipeline over the two released MP4 clips. It decodes frames at 1 Hz, measures exposure/clipping, Laplacian sharpness and temporal luminance change, and writes per-frame CSV, provenance JSON, a report and an SVG timeline.
 
----
+The committed audit covers **224 real frames**; it found two low-sharpness outliers in Clip B and no widespread black-frame or highlight-clipping failure at the sampled instants.
 
-## Current Learning Focus
+[`Open the project →`](projects/02-uav-flight-video-quality-audit/)
 
-I am currently strengthening my skills in:
+## Research direction
 
-- PyTorch
-- Vision-Language Models (VLMs)
-- Vision-Language-Action Models (VLA models)
-- Multimodal learning
-- Autonomous driving perception and planning
-- Long-horizon reasoning
-- Efficient inference for real-world deployment
-- CARLA / autonomous-driving simulation workflows
-- LiDAR-camera fusion and safety-critical perception
-
----
+I am interested in PhD work involving computer vision, multimodal perception, autonomous systems and Vision–Language–Action research, especially where real-world deployment demands explicit validation, interpretable failure analysis and safe interfaces between learned components and control systems.
 
 ## Contact
 
 **Yuanyuan Tao (Alec)**  
 MSc Electronic Engineering Candidate, Durham University  
-Email: [yuanyuan.tao@durham.ac.uk](mailto:yuanyuan.tao@durham.ac.uk)/[alecktao@163.com](mailto:alecktao@163.com)
+[yuanyuan.tao@durham.ac.uk](mailto:yuanyuan.tao@durham.ac.uk)
