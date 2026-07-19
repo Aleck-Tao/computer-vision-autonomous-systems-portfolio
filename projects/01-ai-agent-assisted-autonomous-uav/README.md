@@ -1,73 +1,69 @@
-# AI-Agent-Assisted Autonomous UAV using LiDAR, Stereo Vision and Starlink
+# AI-Agent-Assisted UAV: Perception, Mission Contracts and Field Testing
 
-**Status:** Ongoing MSc dissertation, Durham University  
-**Keywords:** UAV, LiDAR, stereo vision, SLAM-style navigation, obstacle avoidance, AI agent, natural-language instruction, Starlink communication, autonomous systems
+**Status:** ongoing MSc dissertation work at Durham University
+**Research context:** UAV autonomy, LiDAR and stereo perception, mission-level language interfaces, remote communication and safety validation
 
----
+This project studies how a natural-language mission can be converted into an explicit machine-readable contract, checked against deterministic safety rules, and combined with perception/navigation outputs before any action request reaches a flight-control interface.
 
-## Project Overview
+The public repository focuses on architecture, validation interfaces and evidence that can be released safely. It does not publish confidential dissertation logs or present the rule-based language parser as a trained VLA model.
 
-This project investigates an autonomous UAV system using LiDAR and stereo vision for SLAM-style navigation and obstacle avoidance. The project is being extended with an AI-agent layer that interprets natural-language mission instructions and converts them into structured mission objectives, safety constraints and autonomous-flight actions.
+## Physical test evidence
 
-Starlink-enabled remote communication is included in the thesis direction to support long-range supervision, command transmission and data transfer under infrastructure-limited conditions.
+<p>
+  <img src="assets/flight_test_clip_a.jpg" alt="UAV outdoor test clip A" width="49%">
+  <img src="assets/flight_test_clip_b.jpg" alt="UAV outdoor test clip B" width="49%">
+</p>
 
-The project is relevant to Vision-Language-Action research because it connects:
+The repository contains two outdoor UAV test clips with a combined duration of 3:43. File hashes, container metadata and the evidence boundary are documented in [`docs/flight_test_evidence.md`](docs/flight_test_evidence.md).
 
-- visual/spatial perception,
-- language-based instruction,
-- autonomous decision-making,
-- safety-aware action execution,
-- real-time sensing,
-- remote communication constraints.
-
----
-
-## System Concept
+## System boundary
 
 ```mermaid
-flowchart TD
-    U[User text instruction] --> A[AI-agent mission parser]
-    A --> B[Structured mission JSON]
-    B --> C[Safety and feasibility checks]
-    C --> D[Navigation objectives]
-    E[LiDAR + stereo sensing] --> F[Obstacle / map representation]
-    F --> D
-    D --> G[UAV control interface]
-    G --> H[Execution logs]
-    I[Starlink / remote communication] --> A
-    I --> H
-    H --> J[Trajectory and failure-mode analysis]
+flowchart LR
+    U["Natural-language mission"] --> P["Mission contract parser"]
+    P --> J["Structured JSON contract"]
+    J --> S["Deterministic safety gate"]
+    L["LiDAR / stereo perception"] --> N["Navigation state"]
+    N --> S
+    S -->|accepted| C["Flight-control interface"]
+    S -->|blocked| R["Operator review"]
+    C --> T["Timestamped telemetry"]
+    T --> D["Integrity + trajectory diagnostics"]
 ```
 
----
+The learned/agent component is intentionally separated from the safety gate. Language parsing may evolve, but clearance limits, link-loss behavior and low-confidence stop policies remain explicit and auditable.
 
-## Example Mission Instructions
+## Public implementation
 
-```text
-Inspect the corridor, keep at least 1.5 metres away from obstacles, and return to the start point if the link becomes unstable.
-
-Move to the target area, avoid obstacles, maintain low speed, and stop if LiDAR confidence is low.
-
-Search the indoor test area and generate a short report of detected obstacles and risky regions.
-```
-
----
-
-## Repository Contents
-
-| File | Purpose |
+| Artifact | What it demonstrates |
 |---|---|
-| `docs/system_architecture.md` | Architecture and data-flow description |
-| `docs/vla_relevance.md` | How this project connects to VLA/autonomous-driving research |
-| `docs/safety_and_validation.md` | Safety-aware design and validation plan |
-| `scripts/mission_parser.py` | Representative rule-based text-to-mission parser |
-| `scripts/safety_checks.py` | Example safety-check module for structured mission plans |
-| `scripts/trajectory_plot_demo.py` | Synthetic trajectory visualization demo |
-| `sample_data/sample_mission_commands.txt` | Example text instructions |
-| `sample_data/sample_mission_output.json` | Example structured mission output |
+| `scripts/mission_parser.py` | Converts constrained English mission instructions into typed JSON fields |
+| `scripts/safety_checks.py` | Blocks unsupported speed, unsafe clearance and missing fail-safe behavior |
+| `sample_data/sample_mission_commands.txt` | Three mission contracts used for parser regression checks |
+| `docs/system_architecture.md` | Module boundaries and data flow |
+| `docs/safety_and_validation.md` | Safety constraints and experiment acceptance criteria |
+| [`../03-slam-perception-visualization-debugging-tools/`](../03-slam-perception-visualization-debugging-tools/) | Reproducible timing, synchronization and trajectory quality gate |
 
----
+Run the public mission path:
 
-## Current Development Status
+```bash
+python scripts/mission_parser.py
+python scripts/safety_checks.py
+```
 
-This is an ongoing MSc dissertation project. The public repository intentionally avoids sharing confidential raw logs, third-party datasets or unpublished thesis material. The code provided here is representative and designed to show the research direction, system logic and reproducible development style.
+## What is demonstrated—and what is not
+
+Demonstrated publicly:
+
+- a physical UAV flown in outdoor field tests;
+- explicit mission-contract and safety-validation code;
+- a reproducible multi-sensor/trajectory diagnostic pipeline;
+- architecture linking perception, language, safety, control and post-flight validation.
+
+Not claimed by the public evidence:
+
+- end-to-end autonomous flight in the released videos;
+- measured LiDAR/stereo localization accuracy on those flights;
+- a trained VLA policy or safety-certified flight stack.
+
+This distinction is deliberate: each research claim should point to code, data, a metric or a clearly stated ongoing-work boundary.

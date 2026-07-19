@@ -1,10 +1,8 @@
-"""
-Representative text-to-mission parser for an AI-agent-assisted UAV project.
+"""Deterministic adapter from constrained mission language to a typed contract.
 
-This script is intentionally simple and transparent. It does not claim to be a
-trained VLA model. It demonstrates how a natural-language mission instruction can
-be converted into a structured mission plan that can later be checked by a safety
-module or replaced by an LLM/VLA component.
+This parser is the transparent public adapter used to exercise the downstream
+safety interface.  It is deliberately not presented as a trained VLA model: a
+learned parser can replace it later without changing the validated contract.
 """
 
 from __future__ import annotations
@@ -15,7 +13,7 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 
 
-@dataclass
+@dataclass(frozen=True)
 class MissionPlan:
     mission_type: str = "inspection"
     target_area: str = "unknown"
@@ -37,41 +35,56 @@ def parse_clearance(text: str) -> float:
 
 def parse_instruction(text: str) -> MissionPlan:
     lower = text.lower()
-    plan = MissionPlan(source_instruction=text)
+    mission_type = "inspection"
+    target_area = "unknown"
+    speed_mode = "normal"
+    min_obstacle_clearance_m = 1.0
+    return_to_home_on_link_loss = False
+    stop_on_low_lidar_confidence = False
+    report_required = False
 
     if "corridor" in lower:
-        plan.target_area = "corridor"
+        target_area = "corridor"
     elif "target area" in lower:
-        plan.target_area = "target_area"
+        target_area = "target_area"
     elif "indoor" in lower or "test area" in lower:
-        plan.target_area = "indoor_test_area"
+        target_area = "indoor_test_area"
 
     if "search" in lower:
-        plan.mission_type = "search"
+        mission_type = "search"
     elif "inspect" in lower:
-        plan.mission_type = "inspection"
+        mission_type = "inspection"
     elif "move" in lower:
-        plan.mission_type = "navigation"
+        mission_type = "navigation"
 
     if "low speed" in lower or "slow" in lower:
-        plan.speed_mode = "low"
+        speed_mode = "low"
     elif "fast" in lower:
-        plan.speed_mode = "high"
+        speed_mode = "high"
 
     if "avoid" in lower or "obstacle" in lower:
-        plan.min_obstacle_clearance_m = parse_clearance(text)
+        min_obstacle_clearance_m = parse_clearance(text)
 
     if "link" in lower or "communication" in lower or "starlink" in lower:
         if "unstable" in lower or "loss" in lower or "lost" in lower:
-            plan.return_to_home_on_link_loss = True
+            return_to_home_on_link_loss = True
 
     if "low lidar confidence" in lower or "confidence is low" in lower:
-        plan.stop_on_low_lidar_confidence = True
+        stop_on_low_lidar_confidence = True
 
     if "report" in lower or "describe" in lower or "generate" in lower:
-        plan.report_required = True
+        report_required = True
 
-    return plan
+    return MissionPlan(
+        mission_type=mission_type,
+        target_area=target_area,
+        speed_mode=speed_mode,
+        min_obstacle_clearance_m=min_obstacle_clearance_m,
+        return_to_home_on_link_loss=return_to_home_on_link_loss,
+        stop_on_low_lidar_confidence=stop_on_low_lidar_confidence,
+        report_required=report_required,
+        source_instruction=text,
+    )
 
 
 def main() -> None:

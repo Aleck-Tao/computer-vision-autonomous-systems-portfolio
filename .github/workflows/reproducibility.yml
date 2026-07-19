@@ -1,0 +1,41 @@
+name: reproducibility
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            projects/02-uav-flight-video-quality-audit/requirements.txt
+            projects/03-slam-perception-visualization-debugging-tools/requirements.txt
+      - name: Install diagnostic dependencies
+        working-directory: projects/03-slam-perception-visualization-debugging-tools
+        run: python -m pip install -r requirements.txt
+      - name: Run diagnostic tests
+        working-directory: projects/03-slam-perception-visualization-debugging-tools
+        run: python -m unittest discover -s tests -v
+      - name: Run mission-contract tests
+        working-directory: projects/01-ai-agent-assisted-autonomous-uav
+        run: python -m unittest discover -s tests -v
+      - name: Install video-audit dependencies
+        working-directory: projects/02-uav-flight-video-quality-audit
+        run: python -m pip install -r requirements.txt
+      - name: Run video-audit tests
+        working-directory: projects/02-uav-flight-video-quality-audit
+        run: python -m unittest discover -s tests -v
+      - name: Reproduce real-video audit
+        working-directory: projects/02-uav-flight-video-quality-audit
+        run: python -m videoaudit
+      - name: Reproduce benchmark outputs
+        working-directory: projects/03-slam-perception-visualization-debugging-tools
+        run: python -m uavdiag benchmark
+      - name: Verify committed results are reproducible
+        run: git diff --exit-code -- projects/02-uav-flight-video-quality-audit/results projects/03-slam-perception-visualization-debugging-tools/data projects/03-slam-perception-visualization-debugging-tools/results

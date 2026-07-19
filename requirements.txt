@@ -1,7 +1,5 @@
-numpy>=1.23
-pandas>=1.5
-matplotlib>=3.6
-# Optional for deep learning templates:
-# torch
-# torchvision
-# opencv-python
+# Main reproducible diagnostics project
+numpy==2.3.5
+
+# Real UAV video quality audit
+imageio-ffmpeg==0.6.0
