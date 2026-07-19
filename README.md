@@ -80,4 +80,4 @@ I am currently strengthening my skills in:
 
 **Yuanyuan Tao (Alec)**  
 MSc Electronic Engineering Candidate, Durham University  
-Email: [yuanyuan.tao@durham.ac.uk](mailto:yuanyuan.tao@durham.ac.uk)
+Email: [yuanyuan.tao@durham.ac.uk](mailto:yuanyuan.tao@durham.ac.uk)/[alecktao@163.com](mailto:alecktao@163.com)
