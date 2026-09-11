@@ -1,69 +1,40 @@
-# AI-Agent-Assisted UAV: Perception, Mission Contracts and Field Testing
+# UAV Mission Contracts and Field-Test Analysis
 
-**Status:** ongoing MSc dissertation work at Durham University
-**Research context:** UAV autonomy, LiDAR and stereo perception, mission-level language interfaces, remote communication and safety validation
+This project connects a mission-interface design with outdoor UAV field media and post-test analysis. The executable mission path uses a rule-based parser, a JSON contract and checks on speed, obstacle clearance and contingency flags.
 
-This project studies how a natural-language mission can be converted into an explicit machine-readable contract, checked against deterministic safety rules, and combined with perception/navigation outputs before any action request reaches a flight-control interface.
+## Inspect the contract
 
-The public repository focuses on architecture, validation interfaces and evidence that can be released safely. It does not publish confidential dissertation logs or present the rule-based language parser as a trained VLA model.
-
-## Physical test evidence
-
-<p>
-  <img src="assets/flight_test_clip_a.jpg" alt="UAV outdoor test clip A" width="49%">
-  <img src="assets/flight_test_clip_b.jpg" alt="UAV outdoor test clip B" width="49%">
-</p>
-
-The repository contains two outdoor UAV test clips with a combined duration of 3:43. File hashes, container metadata and the evidence boundary are documented in [`docs/flight_test_evidence.md`](docs/flight_test_evidence.md).
-
-## System boundary
-
-```mermaid
-flowchart LR
-    U["Natural-language mission"] --> P["Mission contract parser"]
-    P --> J["Structured JSON contract"]
-    J --> S["Deterministic safety gate"]
-    L["LiDAR / stereo perception"] --> N["Navigation state"]
-    N --> S
-    S -->|accepted| C["Flight-control interface"]
-    S -->|blocked| R["Operator review"]
-    C --> T["Timestamped telemetry"]
-    T --> D["Integrity + trajectory diagnostics"]
-```
-
-The learned/agent component is intentionally separated from the safety gate. Language parsing may evolve, but clearance limits, link-loss behavior and low-confidence stop policies remain explicit and auditable.
-
-## Public implementation
-
-| Artifact | What it demonstrates |
-|---|---|
-| `scripts/mission_parser.py` | Converts constrained English mission instructions into typed JSON fields |
-| `scripts/safety_checks.py` | Blocks unsupported speed, unsafe clearance and missing fail-safe behavior |
-| `sample_data/sample_mission_commands.txt` | Three mission contracts used for parser regression checks |
-| `docs/system_architecture.md` | Module boundaries and data flow |
-| `docs/safety_and_validation.md` | Safety constraints and experiment acceptance criteria |
-| [`../03-slam-perception-visualization-debugging-tools/`](../03-slam-perception-visualization-debugging-tools/) | Reproducible timing, synchronization and trajectory quality gate |
-
-Run the public mission path:
+The parser extracts fields from constrained English requests. The validator checks a supplied contract against clearance limits of 0.75–5.0 m, low/normal speed, link-loss return and low-confidence stop requirements.
 
 ```bash
 python scripts/mission_parser.py
 python scripts/safety_checks.py
+python -m unittest discover -s tests -v
 ```
 
-## What is demonstrated—and what is not
+The first script writes parsed examples to `sample_data/parsed_mission_examples.json`. The second reads the separately supplied [sample contract](sample_data/sample_mission_output.json); it does not automatically validate the first script's output. For a combined parse-and-check command and batch decisions, use the [standalone mission package](https://github.com/Aleck-Tao/safety-constrained-uav-mission-interface).
 
-Demonstrated publicly:
+Separating the contract from its parser makes the policy inspectable. It also exposes a distinction: a required flag can be present even if the instruction was misunderstood. The keyword parser does not resolve negation, and the sample JSON is a hand-specified contract rather than a guaranteed parse of its source text.
 
-- a physical UAV flown in outdoor field tests;
-- explicit mission-contract and safety-validation code;
-- a reproducible multi-sensor/trajectory diagnostic pipeline;
-- architecture linking perception, language, safety, control and post-flight validation.
+## Interface design
 
-Not claimed by the public evidence:
+```mermaid
+flowchart LR
+    I["Constrained mission text"] --> P["Rule-based parser"]
+    P --> J["JSON contract"]
+    J --> G["Field and policy checks"]
+    G --> R["Accepted / review + reasons"]
+```
 
-- end-to-end autonomous flight in the released videos;
-- measured LiDAR/stereo localization accuracy on those flights;
-- a trained VLA policy or safety-certified flight stack.
+A vehicle integration would then combine the accepted contract with current perception, link state and control constraints. Those interfaces are described in [system architecture](docs/system_architecture.md). A static clearance check concerns the requested value; a runtime stopping check also depends on speed, observation age and available deceleration. The [validation notes](docs/safety_and_validation.md) develop that distinction.
 
-This distinction is deliberate: each research claim should point to code, data, a metric or a clearly stated ongoing-work boundary.
+## Field material
+
+<p>
+  <img src="assets/flight_test_clip_a.jpg" alt="Outdoor UAV test, clip A" width="49%">
+  <img src="assets/flight_test_clip_b.jpg" alt="Outdoor UAV test, clip B" width="49%">
+</p>
+
+The two outdoor clips document physical flight testing. Their file records and original media are in [flight_test_evidence.md](docs/flight_test_evidence.md). The [video audit](../02-uav-flight-video-quality-audit/) measures exposure and sharpness over 224 samples; the [multisensor diagnostic project](../03-slam-perception-visualization-debugging-tools/) provides a separate synthetic timing and trajectory benchmark.
+
+The public results cover contract checks, video quality and controlled log analysis. The recordings do not establish that the mission interface controlled the flights. [Parser research notes](docs/vla_relevance.md) describe how a learned front end could be compared against the current adapter.

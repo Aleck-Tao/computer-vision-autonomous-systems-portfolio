@@ -1,38 +1,24 @@
-# Safety and Validation Plan
+# Static limits and runtime stopping margin
 
-## Safety Constraints
+The public contract validator checks a requested clearance and speed category. A runtime decision also needs a model of how far the vehicle can move before it stops.
 
-A mission plan should include explicit safety constraints before action execution. Example constraints:
+For a one-dimensional approach toward a stationary obstacle with speed `v >= 0`, total observation/actuation delay `tau >= 0`, and constant braking deceleration `a > 0`, assume speed stays constant during the delay. The stopping distance is
 
-- minimum obstacle clearance,
-- maximum speed,
-- low-confidence stop condition,
-- communication-loss return condition,
-- manual override availability,
-- geofenced or indoor-test-area limits.
+```text
+d_stop = v * tau + v^2 / (2 * a).
+```
 
-## Validation Metrics
+With an allowance `e >= 0` for clearance uncertainty, the corresponding margin is `d_measured - e - d_stop`. This is a kinematic analysis under the stated assumptions, not a measured braking result. It shows why one fixed clearance threshold cannot apply equally at every speed:
 
-Possible validation metrics include:
+```text
+partial d_stop / partial tau = v
+partial d_stop / partial v   = tau + v / a.
+```
 
-| Category | Example metric |
-|---|---|
-| Perception | obstacle-detection consistency, point/feature stability |
-| Timing | sensor update interval, communication latency, command delay |
-| Trajectory | drift, deviation from planned path, return-to-home success |
-| Safety | number of safety violations, emergency stop triggers |
-| Communication | link availability, packet loss, command acknowledgement delay |
+Delay consumes distance linearly; speed also increases the braking term quadratically. A vehicle-specific check would need a conservative deceleration estimate, documented latency and an uncertainty allowance. The [runtime replay project](https://github.com/Aleck-Tao/runtime-safety-assurance-uav) explores a related stopping-margin monitor under its synthetic model.
 
-## Failure-Mode Logging
+## What to record in an integrated test
 
-Failure cases should be recorded with:
+Log the request and parsed contract, timestamped state used at the decision, policy result, recommendation, executed action and reference measurements. Keeping recommendation and execution separate allows three failures to be distinguished: incorrect interpretation, inadequate constraints, and a correctly requested action that was not carried out.
 
-- timestamp,
-- sensor status,
-- command state,
-- trajectory position,
-- action selected,
-- safety-check result,
-- brief interpretation.
-
-This approach supports interpretable validation of autonomous systems rather than relying only on final success/failure outcomes.
+The [synthetic diagnostic pipeline](../../03-slam-perception-visualization-debugging-tools/) checks timing and reference/estimate alignment. The [field-video audit](../../02-uav-flight-video-quality-audit/) identifies visually weak segments. These checks determine whether a recording supports the quantity being evaluated; thresholds should be chosen for that quantity and platform.

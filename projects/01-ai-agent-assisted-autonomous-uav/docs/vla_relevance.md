@@ -1,35 +1,15 @@
-# Relevance to Vision-Language-Action Research
+# Comparing mission parsers
 
-Vision-Language-Action (VLA) models aim to connect perception, language understanding and action generation. This UAV project is not an autonomous-driving benchmark, but it is structurally relevant to VLA research.
+The current front end is a rule-based adapter for constrained mission text. It provides a fixed contract against which a learned parser could be compared.
 
-## 1. Perception
+A useful comparison would keep the downstream policy unchanged and vary only the parser. Requests should include explicit constraints, omitted constraints, negation and conflicts. For each request, a separately specified expected contract would distinguish a parsing error from a policy rejection.
 
-The UAV uses LiDAR/stereo sensing to obtain spatial information about the environment. This corresponds to the visual/spatial input in VLA models.
+Three outcomes should be counted separately:
 
-## 2. Language
+- a correct contract that passes the configured policy;
+- a correct interpretation of an unsafe request that is blocked;
+- an incorrect interpretation, including one that happens to pass the policy.
 
-The AI-agent layer accepts natural-language mission commands. Examples include obstacle clearance, target area, return behaviour and safety constraints.
+The third case matters because policy acceptance can otherwise be mistaken for language understanding. For example, keyword detection of “low LiDAR confidence” does not by itself establish whether the instruction asks to stop or asks not to stop.
 
-## 3. Action
-
-The structured mission plan can be converted into navigation objectives, safety policies and stop/return decisions.
-
-## 4. Safety and Generalization
-
-The project emphasizes safety-aware execution and failure diagnosis. This connects to key research questions in VLA autonomous driving, including:
-
-- robustness to rare or novel situations,
-- long-horizon task reasoning,
-- safe action execution,
-- interpretable failure analysis,
-- efficient inference for real deployment.
-
-## 5. Future Extensions
-
-Possible extensions include:
-
-- connecting the parser to an LLM/VLM/VLA model,
-- adding camera-image captions for mission awareness,
-- integrating LiDAR-camera fusion,
-- using CARLA or another simulator for driving-style VLA experiments,
-- evaluating failure cases under communication loss or low sensor confidence.
+Adding visual observations introduces another question: did the parser ground the target in the current scene? That requires paired observations and target annotations. The current mission examples exercise text-to-contract handling; the field-video audit measures image quality. Combining them into a grounding experiment would require an explicit correspondence between instruction, observation and expected target.
